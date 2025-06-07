@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/varsha.github.io/static/css/main.dd906367.css",
+    "main.js": "/varsha.github.io/static/js/main.2c5d3df8.js",
+    "index.html": "/varsha.github.io/index.html",
+    "main.dd906367.css.map": "/varsha.github.io/static/css/main.dd906367.css.map",
+    "main.2c5d3df8.js.map": "/varsha.github.io/static/js/main.2c5d3df8.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dd906367.css",
+    "static/js/main.2c5d3df8.js"
+  ]
+}
