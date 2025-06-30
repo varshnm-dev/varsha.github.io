@@ -15,6 +15,8 @@ const HouseholdSettings = () => {
   });
   const [newInviteCode, setNewInviteCode] = useState('');
   const [generatingCode, setGeneratingCode] = useState(false);
+  const [createHouseholdData, setCreateHouseholdData] = useState({ name: '' });
+  const [creatingHousehold, setCreatingHousehold] = useState(false);
 
   useEffect(() => {
     fetchHousehold();
@@ -31,8 +33,14 @@ const HouseholdSettings = () => {
       });
       setError(null);
     } catch (err) {
-      setError('Failed to fetch household information');
-      toast.error('Failed to load household settings');
+      // If user doesn't have a household yet, that's expected for new users
+      if (err.response?.status === 404) {
+        setHousehold(null);
+        setError(null);
+      } else {
+        setError('Failed to fetch household information');
+        toast.error('Failed to load household settings');
+      }
     } finally {
       setLoading(false);
     }
@@ -74,6 +82,33 @@ const HouseholdSettings = () => {
   const copyInviteCode = () => {
     navigator.clipboard.writeText(household.inviteCode);
     toast.success('Invite code copied to clipboard!');
+  };
+
+  const handleCreateHousehold = async () => {
+    if (!createHouseholdData.name.trim()) {
+      toast.error('Please enter a household name');
+      return;
+    }
+
+    try {
+      setCreatingHousehold(true);
+      await api.createHousehold(createHouseholdData);
+      toast.success('Household created successfully!');
+      setCreateHouseholdData({ name: '' });
+      fetchHousehold(); // Refresh the page data
+    } catch (err) {
+      toast.error('Failed to create household');
+    } finally {
+      setCreatingHousehold(false);
+    }
+  };
+
+  const handleCreateHouseholdInputChange = (e) => {
+    const { name, value } = e.target;
+    setCreateHouseholdData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const formatDate = (dateString) => {
@@ -127,6 +162,63 @@ const HouseholdSettings = () => {
             marginBottom: '20px' 
           }}>
             {error}
+          </div>
+        )}
+
+        {!household && !error && (
+          /* Create Household Section for users without households */
+          <div style={{
+            backgroundColor: '#fff',
+            border: '1px solid #e0e0e0',
+            borderRadius: '10px',
+            padding: '30px',
+            marginBottom: '30px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#333' }}>Create Your Household</h3>
+            <p style={{ color: '#666', marginBottom: '30px' }}>
+              Welcome! As an admin, you can create your household to start managing chores and inviting family members.
+            </p>
+            
+            <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+              <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                  Household Name:
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={createHouseholdData.name}
+                  onChange={handleCreateHouseholdInputChange}
+                  placeholder="Enter your household name (e.g., The Smith Family)"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '16px'
+                  }}
+                />
+              </div>
+              
+              <button
+                onClick={handleCreateHousehold}
+                disabled={creatingHousehold || !createHouseholdData.name.trim()}
+                style={{
+                  backgroundColor: creatingHousehold || !createHouseholdData.name.trim() ? '#6c757d' : '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 30px',
+                  borderRadius: '5px',
+                  cursor: creatingHousehold || !createHouseholdData.name.trim() ? 'not-allowed' : 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
+              >
+                {creatingHousehold ? 'Creating...' : '🏠 Create Household'}
+              </button>
+            </div>
           </div>
         )}
 

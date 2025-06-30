@@ -45,16 +45,32 @@ exports.register = async (req, res) => {
             });
         }
 
-        // Check if household exists if provided
+        // Check if household exists if provided (by invite code)
         let household;
         if (householdId) {
-            household = await Household.findById(householdId);
+            household = await Household.findOne({ inviteCode: householdId });
             if (!household) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Household not found'
+                    message: 'Invalid invite code'
                 });
             }
+        }
+
+        let newHousehold;
+        
+        // If no householdId provided, create a new household for the user
+        if (!householdId) {
+            // Create a default household name based on username
+            const defaultHouseholdName = `${username}'s Household`;
+            
+            newHousehold = await Household.create({
+                name: defaultHouseholdName,
+                admin: null, // Will be set after user creation
+                members: [],
+                pointMultiplier: 1.0
+                // inviteCode will be generated automatically by the pre-save hook
+            });
         }
 
         // Create new user
@@ -62,12 +78,18 @@ exports.register = async (req, res) => {
             username,
             email,
             password,
-            household: householdId || null,
-            role: !householdId ? 'admin' : 'member' // First user is admin if creating new household
+            household: household?._id || newHousehold?._id || null,
+            role: !householdId ? 'admin' : 'member'
         });
 
-        // Add user to household members if joining existing household
-        if (household) {
+        // Add user to household members and set admin
+        if (newHousehold) {
+            // For new household, set user as admin and add to members
+            newHousehold.admin = newUser._id;
+            newHousehold.members.push(newUser._id);
+            await newHousehold.save();
+        } else if (household) {
+            // For existing household, just add user to members
             household.members.push(newUser._id);
             await household.save();
         }
