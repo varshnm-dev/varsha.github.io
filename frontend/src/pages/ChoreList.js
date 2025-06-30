@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ChoreMarketplace from '../components/ChoreMarketplace';
 import { toast } from 'react-toastify';
 
 const ChoreList = () => {
@@ -13,6 +14,7 @@ const ChoreList = () => {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showMarketplace, setShowMarketplace] = useState(false);
   const [editingChore, setEditingChore] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -169,25 +171,42 @@ const ChoreList = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <h1 style={{ margin: 0, color: '#333' }}>Available Chores</h1>
           {user?.role === 'admin' && (
-            <button
-              onClick={() => {
-                setEditingChore(null);
-                resetForm();
-                setShowCreateForm(true);
-              }}
-              style={{
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold'
-              }}
-            >
-              + Add New Chore
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setShowMarketplace(true)}
+                style={{
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold'
+                }}
+              >
+                🛍️ Browse Marketplace
+              </button>
+              <button
+                onClick={() => {
+                  setEditingChore(null);
+                  resetForm();
+                  setShowCreateForm(true);
+                }}
+                style={{
+                  backgroundColor: '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold'
+                }}
+              >
+                ➕ Create Custom Chore
+              </button>
+            </div>
           )}
         </div>
 
@@ -580,7 +599,36 @@ const ChoreList = () => {
                 : 'No chores have been created yet.'
               }
             </p>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => setShowMarketplace(true)}
+                style={{
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  marginTop: '20px'
+                }}
+              >
+                🛍️ Browse Marketplace to Add Chores
+              </button>
+            )}
           </div>
+        )}
+
+        {/* Chore Marketplace Modal */}
+        {showMarketplace && (
+          <ChoreMarketplace
+            onChoreAdded={() => {
+              fetchAllChores();
+              setShowMarketplace(false);
+            }}
+            onClose={() => setShowMarketplace(false)}
+          />
         )}
       </div>
     </div>

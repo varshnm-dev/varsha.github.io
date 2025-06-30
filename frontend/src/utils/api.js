@@ -99,6 +99,26 @@ const api = {
     return axios.post(`/households/${householdId}/generate-invite`);
   },
 
+  // Chore Templates (Marketplace)
+  getChoreTemplates: async (category = null, search = null) => {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (search) params.append('search', search);
+    return axios.get(`/chore-templates?${params.toString()}`);
+  },
+
+  getChoreTemplatesByCategory: async () => {
+    return axios.get('/chore-templates/by-category');
+  },
+
+  getChoreTemplate: async (id) => {
+    return axios.get(`/chore-templates/${id}`);
+  },
+
+  addChoreFromTemplate: async (templateId) => {
+    return axios.post(`/chores/from-template/${templateId}`);
+  },
+
   // Achievements
   getMyAchievements: async () => {
     return axios.get('/achievements/my-achievements');
