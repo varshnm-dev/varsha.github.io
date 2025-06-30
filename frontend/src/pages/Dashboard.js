@@ -99,6 +99,38 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Household Info Card */}
+      {household && (
+        <div className="dashboard-section">
+          <div className="household-info-card">
+            <div className="household-header">
+              <div className="household-icon">🏠</div>
+              <div className="household-details">
+                <h3>{household.name}</h3>
+                <p>You are a {user?.role === 'admin' ? 'Administrator' : 'Member'} in this household</p>
+              </div>
+            </div>
+            <div className="household-stats">
+              <div className="household-stat">
+                <span className="stat-label">Members</span>
+                <span className="stat-value">{household.members?.length || 0}</span>
+              </div>
+              <div className="household-stat">
+                <span className="stat-label">Invite Code</span>
+                <span className="stat-value household-code">{household.inviteCode}</span>
+              </div>
+              {user?.role === 'admin' && (
+                <div className="household-stat">
+                  <Link to="/admin/household" className="btn btn-primary btn-sm">
+                    Manage Household
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="dashboard-content">
         <div className="dashboard-section">
           <div className="section-header">

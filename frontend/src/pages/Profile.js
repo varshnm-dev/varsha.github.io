@@ -222,6 +222,58 @@ const Profile = () => {
           )}
         </div>
 
+        {/* Household Information */}
+        {user?.household && (
+          <div style={{
+            backgroundColor: '#fff',
+            border: '1px solid #e0e0e0',
+            borderRadius: '10px',
+            padding: '30px',
+            marginBottom: '30px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#333' }}>🏠 Household Information</h3>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+              gap: '20px' 
+            }}>
+              <div>
+                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Household Name</h4>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+                  {user.household?.name || 'Loading...'}
+                </div>
+              </div>
+              
+              <div>
+                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Your Role</h4>
+                <span style={{
+                  backgroundColor: getRoleBadgeColor(user?.role),
+                  color: 'white',
+                  padding: '4px 12px',
+                  borderRadius: '15px',
+                  fontSize: '14px',
+                  fontWeight: 'bold'
+                }}>
+                  {getRoleDisplay(user?.role)}
+                </span>
+              </div>
+              
+              <div>
+                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Member Since</h4>
+                <div style={{ fontSize: '16px', color: '#333' }}>
+                  {new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* User Statistics */}
         {userStats && (
           <div style={{

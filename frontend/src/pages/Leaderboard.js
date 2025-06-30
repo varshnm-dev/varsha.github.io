@@ -10,11 +10,28 @@ const Leaderboard = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('daily');
   const [periodInfo, setPeriodInfo] = useState(null);
+  const [household, setHousehold] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetchLeaderboard();
+    fetchData();
   }, [activeTab]);
+
+  const fetchData = async () => {
+    await Promise.all([
+      fetchLeaderboard(),
+      fetchHousehold()
+    ]);
+  };
+
+  const fetchHousehold = async () => {
+    try {
+      const response = await api.getHousehold();
+      setHousehold(response.data.data.household);
+    } catch (err) {
+      console.log('User not in household:', err);
+    }
+  };
 
   const fetchLeaderboard = async () => {
     try {
@@ -93,9 +110,28 @@ const Leaderboard = () => {
   return (
     <div className="page-container">
       <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ marginBottom: '30px', color: '#333', textAlign: 'center' }}>
+        <h1 style={{ marginBottom: '10px', color: '#333', textAlign: 'center' }}>
           🏆 Leaderboard
         </h1>
+        
+        {/* Household Context */}
+        {household && (
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: '30px', 
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '8px',
+            border: '1px solid #e9ecef'
+          }}>
+            <h3 style={{ margin: '0 0 5px 0', color: '#495057', fontSize: '18px' }}>
+              🏠 {household.name}
+            </h3>
+            <p style={{ margin: 0, color: '#6c757d', fontSize: '14px' }}>
+              Competing with {household.members?.length || 0} household members
+            </p>
+          </div>
+        )}
 
         {error && (
           <div style={{ 
