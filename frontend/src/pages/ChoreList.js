@@ -28,6 +28,16 @@ const ChoreList = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Predefined chore categories
+  const allCategories = [
+    'Kitchen & Dining',
+    'Laundry & Clothes',
+    'Cleaning & Maintenance',
+    'Shopping & Errands',
+    'Bedroom & Organization',
+    'Other'
+  ];
+
   useEffect(() => {
     fetchAllChores();
   }, []);
@@ -48,9 +58,9 @@ const ChoreList = () => {
       setAllChores(choresList);
       setChores(choresList);
       
-      // Extract unique categories
-      const uniqueCategories = [...new Set(choresList.map(chore => chore.category))];
-      setCategories(uniqueCategories);
+      // Extract unique categories from existing chores
+      const existingCategories = [...new Set(choresList.map(chore => chore.category))];
+      setCategories(existingCategories);
       
       setError(null);
     } catch (err) {
@@ -275,7 +285,7 @@ const ChoreList = () => {
                   required
                 >
                   <option value="">Select Category</option>
-                  {categories.map(category => (
+                  {allCategories.map(category => (
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
@@ -431,29 +441,31 @@ const ChoreList = () => {
           </div>
         )}
 
-        {/* Category Filter */}
-        <div style={{ marginBottom: '30px' }}>
-          <label htmlFor="category" style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-            Filter by Category:
-          </label>
-          <select
-            id="category"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{
-              padding: '10px',
-              borderRadius: '5px',
-              border: '1px solid #ddd',
-              fontSize: '16px',
-              minWidth: '200px'
-            }}
-          >
-            <option value="">All Categories</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
+        {/* Category Filter - Only show if there are chores */}
+        {chores.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <label htmlFor="category" style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Filter by Category:
+            </label>
+            <select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                padding: '10px',
+                borderRadius: '5px',
+                border: '1px solid #ddd',
+                fontSize: '16px',
+                minWidth: '200px'
+              }}
+            >
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {error && (
           <div style={{ 
