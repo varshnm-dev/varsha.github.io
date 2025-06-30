@@ -4,6 +4,9 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import WelcomeModal from './components/WelcomeModal';
+import AppTour from './components/AppTour';
+import { useTour } from './context/TourContext';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -18,6 +21,8 @@ import NotFound from './pages/NotFound';
 import './App.css';
 
 function App() {
+  const { showWelcome, runTour, startTour, endTour, closeWelcome } = useTour();
+
   return (
     <div className="app">
       <Navbar />
@@ -44,6 +49,19 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      
+      {/* Welcome Modal for new users */}
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={closeWelcome}
+        onStartTour={startTour}
+      />
+      
+      {/* Interactive Tour */}
+      <AppTour
+        runTour={runTour}
+        onTourEnd={endTour}
+      />
     </div>
   );
 }

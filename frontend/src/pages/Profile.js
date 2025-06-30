@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTour } from '../context/TourContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
+  const { restartTour } = useTour();
   const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -320,6 +322,88 @@ const Profile = () => {
             </div>
           </div>
         )}
+
+        {/* App Preferences */}
+        <div style={{
+          backgroundColor: '#fff',
+          border: '1px solid #e0e0e0',
+          borderRadius: '10px',
+          padding: '30px',
+          marginTop: '30px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ marginBottom: '20px', color: '#333' }}>App Preferences</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px',
+              border: '1px solid #e9ecef'
+            }}>
+              <div>
+                <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>App Tour</h4>
+                <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>
+                  Take the interactive tour again to learn about app features
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  restartTour();
+                  toast.success('Starting app tour!');
+                }}
+                style={{
+                  backgroundColor: '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                🎯 Start Tour
+              </button>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '15px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px',
+              border: '1px solid #e9ecef'
+            }}>
+              <div>
+                <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>Account Type</h4>
+                <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>
+                  {user?.role === 'admin' 
+                    ? 'You have administrative privileges for this household' 
+                    : 'You are a member of this household'
+                  }
+                </p>
+              </div>
+              <span style={{
+                backgroundColor: getRoleBadgeColor(user?.role),
+                color: 'white',
+                padding: '6px 12px',
+                borderRadius: '15px',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {getRoleDisplay(user?.role)}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
