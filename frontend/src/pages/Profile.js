@@ -5,7 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,10 +49,24 @@ const Profile = () => {
 
   const handleSaveProfile = async () => {
     try {
-      // Note: This would require a backend endpoint to update user profile
-      // For now, we'll just show a success message
-      toast.success('Profile updated successfully!');
-      setIsEditing(false);
+      // Validate required fields
+      if (!editData.username.trim()) {
+        toast.error('Username is required');
+        return;
+      }
+      if (!editData.email.trim()) {
+        toast.error('Email is required');
+        return;
+      }
+
+      // Call the updateProfile function from AuthContext
+      const result = await updateProfile(editData);
+      
+      if (result.success) {
+        setIsEditing(false);
+        // The success message is already shown by updateProfile
+        // editData will be updated in useEffect when user changes
+      }
     } catch (err) {
       toast.error('Failed to update profile');
     }
