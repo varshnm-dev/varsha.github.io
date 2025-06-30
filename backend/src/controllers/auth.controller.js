@@ -57,6 +57,15 @@ exports.register = async (req, res) => {
             }
         }
 
+        // Create new user first
+        const newUser = await User.create({
+            username,
+            email,
+            password,
+            household: household?._id || null, // Will be set after household creation if needed
+            role: !householdId ? 'admin' : 'member'
+        });
+
         let newHousehold;
         
         // If no householdId provided, create a new household for the user
@@ -66,28 +75,15 @@ exports.register = async (req, res) => {
             
             newHousehold = await Household.create({
                 name: defaultHouseholdName,
-                admin: null, // Will be set after user creation
-                members: [],
+                admin: newUser._id, // Set user as admin immediately
+                members: [newUser._id], // Add user to members immediately
                 pointMultiplier: 1.0
                 // inviteCode will be generated automatically by the pre-save hook
             });
-        }
 
-        // Create new user
-        const newUser = await User.create({
-            username,
-            email,
-            password,
-            household: household?._id || newHousehold?._id || null,
-            role: !householdId ? 'admin' : 'member'
-        });
-
-        // Add user to household members and set admin
-        if (newHousehold) {
-            // For new household, set user as admin and add to members
-            newHousehold.admin = newUser._id;
-            newHousehold.members.push(newUser._id);
-            await newHousehold.save();
+            // Update user with household reference
+            newUser.household = newHousehold._id;
+            await newUser.save();
         } else if (household) {
             // For existing household, just add user to members
             household.members.push(newUser._id);
