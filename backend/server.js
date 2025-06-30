@@ -13,6 +13,7 @@ dotenv.config();
 const authRoutes = require('./src/routes/auth.routes');
 const userRoutes = require('./src/routes/user.routes');
 const choreRoutes = require('./src/routes/chore.routes');
+const choreTemplateRoutes = require('./src/routes/choreTemplate.routes');
 const householdRoutes = require('./src/routes/household.routes');
 const completedChoreRoutes = require('./src/routes/completedChore.routes');
 const achievementRoutes = require('./src/routes/achievement.routes');
@@ -76,6 +77,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chores', choreRoutes);
+app.use('/api/chore-templates', choreTemplateRoutes);
 app.use('/api/households', householdRoutes);
 app.use('/api/completed-chores', completedChoreRoutes);
 app.use('/api/achievements', achievementRoutes);

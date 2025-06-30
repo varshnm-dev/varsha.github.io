@@ -1,4 +1,5 @@
 const Chore = require('../models/chore.model');
+const ChoreTemplate = require('../models/choreTemplate.model');
 const CompletedChore = require('../models/completedChore.model');
 
 /**
@@ -169,6 +170,69 @@ exports.deleteChore = async (req, res) => {
         res.status(204).json({
             success: true,
             data: null
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+/**
+ * Add chore from template to household (admin only)
+ */
+exports.addChoreFromTemplate = async (req, res) => {
+    try {
+        const { templateId } = req.params;
+
+        // Check if user has a household
+        if (!req.user.household) {
+            return res.status(400).json({
+                success: false,
+                message: 'You must be part of a household to add chores'
+            });
+        }
+
+        // Find the template
+        const template = await ChoreTemplate.findById(templateId);
+        if (!template || !template.isActive) {
+            return res.status(404).json({
+                success: false,
+                message: 'Chore template not found or not available'
+            });
+        }
+
+        // Check if chore with same name already exists in household
+        const existingChore = await Chore.findOne({
+            name: template.name,
+            household: req.user.household
+        });
+
+        if (existingChore) {
+            return res.status(400).json({
+                success: false,
+                message: 'A chore with this name already exists in your household'
+            });
+        }
+
+        // Create new chore from template
+        const newChore = await Chore.create({
+            name: template.name,
+            description: template.description,
+            category: template.category,
+            points: template.points,
+            emoji: template.emoji,
+            difficulty: template.difficulty,
+            estimatedMinutes: template.estimatedMinutes,
+            household: req.user.household
+        });
+
+        res.status(201).json({
+            success: true,
+            data: {
+                chore: newChore
+            }
         });
     } catch (error) {
         res.status(400).json({

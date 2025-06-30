@@ -1,26 +1,9 @@
 const mongoose = require('mongoose');
-const User = require('../models/user.model');
-const Household = require('../models/household.model');
-const Chore = require('../models/chore.model');
-const { seedChoreTemplates } = require('./choreTemplates');
-const dotenv = require('dotenv');
+const ChoreTemplate = require('../models/choreTemplate.model');
 
-// Load environment variables
-dotenv.config();
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-    process.exit(1);
-});
-
-// Sample chores from original Excel sheet
-const originalChores = [
+// Template chores for the marketplace
+const choreTemplates = [
+    // Original chores
     {
         name: 'Wash dishes',
         category: 'Kitchen & Dining',
@@ -121,7 +104,7 @@ const originalChores = [
         name: 'Fold and put away laundry',
         category: 'Laundry & Clothes',
         points: 7,
-        emoji: '🧺',
+        emoji: '👕',
         difficulty: 'Medium',
         estimatedMinutes: 20
     },
@@ -129,7 +112,7 @@ const originalChores = [
         name: 'Clean refrigerator',
         category: 'Kitchen & Dining',
         points: 8,
-        emoji: '❄️',
+        emoji: '🧊',
         difficulty: 'Medium',
         estimatedMinutes: 25
     },
@@ -137,7 +120,7 @@ const originalChores = [
         name: 'Organize closet',
         category: 'Bedroom & Organization',
         points: 9,
-        emoji: '👚',
+        emoji: '👗',
         difficulty: 'Medium',
         estimatedMinutes: 30
     },
@@ -156,11 +139,8 @@ const originalChores = [
         emoji: '🛌',
         difficulty: 'Easy',
         estimatedMinutes: 15
-    }
-];
-
-// Additional chores to add
-const additionalChores = [
+    },
+    // Additional chores
     {
         name: 'Pick up mail',
         category: 'Shopping & Errands',
@@ -227,87 +207,28 @@ const additionalChores = [
     }
 ];
 
-// Combine all chores
-const allChores = [...originalChores, ...additionalChores];
-
-// Seed data function
-const seedData = async () => {
+/**
+ * Seed chore templates to the database
+ */
+async function seedChoreTemplates() {
     try {
-        // Clear existing data
-        await User.deleteMany({});
-        await Household.deleteMany({});
-        await Chore.deleteMany({});
-
-        console.log('Cleared existing data');
-
-        // Create admin user
-        const adminUser = await User.create({
-            username: 'admin',
-            email: 'admin@example.com',
-            password: 'password123',
-            role: 'admin',
-            points: 0
-        });
-
-        console.log('Created admin user');
-
-        // Create household
-        const household = await Household.create({
-            name: 'Demo Household',
-            admin: adminUser._id,
-            members: [adminUser._id],
-            inviteCode: 'DEMO123'
-        });
-
-        console.log('Created household');
-
-        // Update admin user with household
-        adminUser.household = household._id;
-        await adminUser.save({ validateBeforeSave: false });
-
-        // Create member user
-        const memberUser = await User.create({
-            username: 'member',
-            email: 'member@example.com',
-            password: 'password123',
-            role: 'member',
-            household: household._id,
-            points: 0
-        });
-
-        console.log('Created member user');
-
-        // Add member to household
-        household.members.push(memberUser._id);
-        await household.save();
-
-        // Create chores
-        for (const chore of allChores) {
-            await Chore.create({
-                ...chore,
-                household: household._id
-            });
+        // Check if templates already exist
+        const existingCount = await ChoreTemplate.countDocuments();
+        if (existingCount > 0) {
+            console.log(`Found ${existingCount} existing chore templates. Skipping seed.`);
+            return;
         }
 
-        console.log(`Created ${allChores.length} chores`);
-
-        // Seed chore templates for marketplace
-        await seedChoreTemplates();
-
-        console.log('Database seeded successfully!');
-        console.log('');
-        console.log('Login with:');
-        console.log('Admin: admin@example.com / password123');
-        console.log('Member: member@example.com / password123');
-        console.log('');
-
-        // Disconnect from database
-        mongoose.disconnect();
+        // Insert templates
+        await ChoreTemplate.insertMany(choreTemplates);
+        console.log(`Successfully seeded ${choreTemplates.length} chore templates to the marketplace!`);
     } catch (error) {
-        console.error('Error seeding database:', error);
-        process.exit(1);
+        console.error('Error seeding chore templates:', error);
+        throw error;
     }
-};
+}
 
-// Run seed function
-seedData();
+module.exports = {
+    choreTemplates,
+    seedChoreTemplates
+};

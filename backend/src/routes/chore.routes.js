@@ -13,6 +13,9 @@ router.get('/:id', choreController.getChore);
 // Create a new chore (admin only)
 router.post('/', restrictTo('admin'), choreController.createChore);
 
+// Add chore from template (admin only)
+router.post('/from-template/:templateId', restrictTo('admin'), choreController.addChoreFromTemplate);
+
 // Update/Delete chores (admin only)
 router.patch('/:id', restrictTo('admin'), choreController.updateChore);
 router.delete('/:id', restrictTo('admin'), choreController.deleteChore);
