@@ -11,9 +11,7 @@ services:
       - key: PORT
         value: 10000
       - key: MONGODB_URI
-        fromDatabase:
-          name: household-gamification-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -40,7 +38,4 @@ services:
       - key: REACT_APP_APP_NAME
         value: Household Gamification
 
-databases:
-  # MongoDB Database
-  - name: household-gamification-db
-    plan: free
+# Using MongoDB Atlas instead of Render's PostgreSQL database
