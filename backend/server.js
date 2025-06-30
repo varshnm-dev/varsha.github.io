@@ -29,11 +29,34 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
+// Configure CORS for production
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            process.env.CLIENT_URL,
+            process.env.FRONTEND_URL,
+            'http://localhost:3000',
+            'http://127.0.0.1:3000'
+        ].filter(Boolean);
+        
+        // Allow requests with no origin (mobile apps, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+};
+
 // Apply middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
-app.use(morgan('dev')); // HTTP request logger
-app.use(express.json()); // Parse JSON bodies
+app.use(cors(corsOptions)); // Enable CORS with options
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // HTTP request logger
+app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Parse URL-encoded bodies
 app.use(limiter); // Apply rate limiting
 
 // Connect to MongoDB
@@ -58,9 +81,24 @@ app.use('/api/completed-chores', completedChoreRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 
+// Health check route
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'API is healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+    });
+});
+
 // Root route
 app.get('/', (req, res) => {
-    res.send('Household Gamification API is running');
+    res.json({
+        success: true,
+        message: 'Household Gamification API is running',
+        version: '1.0.0',
+        environment: process.env.NODE_ENV
+    });
 });
 
 // Error handling middleware

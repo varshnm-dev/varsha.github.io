@@ -1,0 +1,46 @@
+services:
+  # Backend API Service
+  - type: web
+    name: household-gamification-backend
+    env: node
+    buildCommand: cd backend && npm config set registry https://registry.npmjs.org && npm cache clean --force && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: household-gamification-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: household-gamification-frontend
+          property: host
+
+  # Frontend Service  
+  - type: web
+    name: household-gamification-frontend
+    env: static
+    buildCommand: cd frontend && npm config set registry https://registry.npmjs.org && npm cache clean --force && npm install && npm run build
+    runtime: static
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: household-gamification-backend
+          property: host
+      - key: REACT_APP_APP_NAME
+        value: Household Gamification
+
+databases:
+  # MongoDB Database
+  - name: household-gamification-db
+    plan: free

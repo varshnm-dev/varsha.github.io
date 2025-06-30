@@ -178,6 +178,61 @@ The backend API provides the following endpoints:
 - `GET /api/leaderboard/monthly` - Get monthly leaderboard
 - `GET /api/leaderboard/all-time` - Get all-time leaderboard
 
+## Deployment
+
+### Quick Deploy to Render
+
+1. **Push to GitHub**: Ensure your code is in a GitHub repository
+
+2. **Deploy via Blueprint**:
+   - Go to [render.com](https://render.com) and create an account
+   - Click "New" → "Blueprint"
+   - Connect your GitHub repository
+   - Render will automatically deploy both frontend and backend using `render.yaml`
+
+3. **Manual Setup**: See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed manual deployment instructions
+
+### Production URLs
+- **Frontend**: `https://your-app-name.onrender.com`
+- **Backend API**: `https://your-api-name.onrender.com/api`
+- **Health Check**: `https://your-api-name.onrender.com/health`
+
+### Environment Variables Required
+- Backend: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`
+- Frontend: `REACT_APP_API_URL`
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide with all environment variables and configuration details.
+
+## Files Structure
+
+```
+household-gamification-app/
+├── backend/                 # Node.js/Express API
+│   ├── src/
+│   │   ├── controllers/    # Route controllers
+│   │   ├── models/         # MongoDB models
+│   │   ├── routes/         # API routes
+│   │   ├── middleware/     # Custom middleware
+│   │   └── seeds/          # Database seeding
+│   ├── server.js           # Main server file
+│   ├── package.json        # Backend dependencies
+│   └── render.yaml         # Backend Render config
+├── frontend/               # React application
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   ├── context/        # React context
+│   │   └── utils/          # Utility functions
+│   ├── public/
+│   │   └── _redirects      # Client-side routing config
+│   ├── package.json        # Frontend dependencies
+│   └── render.yaml         # Frontend Render config
+├── render.yaml             # Full-stack deployment config
+├── DEPLOYMENT.md           # Detailed deployment guide
+└── scripts/
+    └── setup-render.sh     # Deployment setup script
+```
+
 ## License
 
 This project is licensed under the MIT License
