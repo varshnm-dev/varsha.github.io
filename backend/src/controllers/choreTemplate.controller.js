@@ -1,10 +1,17 @@
 const ChoreTemplate = require('../models/choreTemplate.model');
+const { seedChoreTemplates } = require('../seeds/choreTemplates');
 
 /**
  * Get all active chore templates for marketplace
  */
 exports.getAllTemplates = async (req, res) => {
     try {
+        // Auto-seed templates if they don't exist
+        const existingCount = await ChoreTemplate.countDocuments();
+        if (existingCount === 0) {
+            await seedChoreTemplates();
+        }
+
         const { category, search } = req.query;
         
         // Build query
@@ -43,6 +50,12 @@ exports.getAllTemplates = async (req, res) => {
  */
 exports.getTemplatesByCategory = async (req, res) => {
     try {
+        // Auto-seed templates if they don't exist
+        const existingCount = await ChoreTemplate.countDocuments();
+        if (existingCount === 0) {
+            await seedChoreTemplates();
+        }
+
         const templates = await ChoreTemplate.aggregate([
             { $match: { isActive: true } },
             {
