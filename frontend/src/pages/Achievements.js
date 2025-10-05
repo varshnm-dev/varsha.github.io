@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
@@ -10,7 +9,6 @@ const Achievements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('my');
-  const { user } = useAuth();
 
   useEffect(() => {
     fetchAchievements();

@@ -73,7 +73,7 @@ const ChoreList = () => {
 
   const handleCompleteChore = async (choreId) => {
     try {
-      const response = await api.completeChore({
+      await api.completeChore({
         chore: choreId,
         qualityRating: 5
       });

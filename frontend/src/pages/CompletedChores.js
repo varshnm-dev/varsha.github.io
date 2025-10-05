@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -12,11 +12,7 @@ const CompletedChores = () => {
   const [totalPages, setTotalPages] = useState(1);
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchCompletedChores();
-  }, [currentPage]);
-
-  const fetchCompletedChores = async () => {
+  const fetchCompletedChores = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.getCompletedChores({
@@ -32,7 +28,11 @@ const CompletedChores = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchCompletedChores();
+  }, [currentPage, fetchCompletedChores]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

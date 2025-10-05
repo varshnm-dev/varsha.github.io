@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -17,11 +17,7 @@ const ChoreDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchChore();
-  }, [id]);
-
-  const fetchChore = async () => {
+  const fetchChore = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.getChore(id);
@@ -43,11 +39,15 @@ const ChoreDetails = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchChore();
+  }, [id, fetchChore]);
 
   const handleCompleteChore = async () => {
     try {
-      const response = await api.completeChore({
+      await api.completeChore({
         chore: id,
         qualityRating,
         notes: completionNotes

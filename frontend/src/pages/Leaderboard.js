@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -13,31 +13,20 @@ const Leaderboard = () => {
   const [household, setHousehold] = useState(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchData();
-  }, [activeTab]);
-
-  const fetchData = async () => {
-    await Promise.all([
-      fetchLeaderboard(),
-      fetchHousehold()
-    ]);
-  };
-
-  const fetchHousehold = async () => {
+  const fetchHousehold = useCallback(async () => {
     try {
       const response = await api.getHousehold();
       setHousehold(response.data.data.household);
     } catch (err) {
       console.log('User not in household:', err);
     }
-  };
+  }, []);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       setLoading(true);
       let response;
-      
+
       switch (activeTab) {
         case 'daily':
           response = await api.getDailyLeaderboard();
@@ -54,7 +43,7 @@ const Leaderboard = () => {
         default:
           response = await api.getDailyLeaderboard();
       }
-      
+
       setLeaderboardData(response.data.data.leaderboard);
       setPeriodInfo({
         periodStart: response.data.periodStart,
@@ -67,7 +56,18 @@ const Leaderboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  const fetchData = useCallback(async () => {
+    await Promise.all([
+      fetchLeaderboard(),
+      fetchHousehold()
+    ]);
+  }, [fetchLeaderboard, fetchHousehold]);
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab, fetchData]);
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
