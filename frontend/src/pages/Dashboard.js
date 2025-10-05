@@ -141,9 +141,9 @@ const Dashboard = () => {
             {recentChores.length > 0 ? (
               recentChores.map((chore) => (
                 <div key={chore._id} className="chore-card">
-                  <div className="chore-emoji">{chore.chore.emoji}</div>
+                  <div className="chore-emoji">{chore.chore?.emoji || '🏠'}</div>
                   <div className="chore-details">
-                    <h4>{chore.chore.name}</h4>
+                    <h4>{chore.chore?.name || 'Unknown Chore'}</h4>
                     <p>Completed on {new Date(chore.completedAt).toLocaleDateString()}</p>
                     <div className="chore-points">+{chore.pointsEarned} points</div>
                   </div>

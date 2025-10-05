@@ -501,22 +501,22 @@ const ChoreList = () => {
               onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
             >
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                <span style={{ fontSize: '24px', marginRight: '10px' }}>{chore.emoji}</span>
-                <h3 style={{ margin: 0, color: '#333' }}>{chore.name}</h3>
+                <span style={{ fontSize: '24px', marginRight: '10px' }}>{chore?.emoji || '🏠'}</span>
+                <h3 style={{ margin: 0, color: '#333' }}>{chore?.name || 'Unknown Chore'}</h3>
               </div>
 
               <div style={{ marginBottom: '10px' }}>
-                <span style={{ 
-                  backgroundColor: getDifficultyColor(chore.difficulty),
+                <span style={{
+                  backgroundColor: getDifficultyColor(chore?.difficulty || 'Easy'),
                   color: 'white',
                   padding: '4px 8px',
                   borderRadius: '15px',
                   fontSize: '12px',
                   fontWeight: 'bold'
                 }}>
-                  {chore.difficulty}
+                  {chore?.difficulty || 'Easy'}
                 </span>
-                <span style={{ 
+                <span style={{
                   backgroundColor: '#f8f9fa',
                   color: '#495057',
                   padding: '4px 8px',
@@ -524,25 +524,26 @@ const ChoreList = () => {
                   fontSize: '12px',
                   marginLeft: '8px'
                 }}>
-                  {chore.category}
+                  {chore?.category || 'General'}
                 </span>
               </div>
 
               <div style={{ marginBottom: '15px', color: '#666', fontSize: '14px' }}>
-                <div>⚡ {chore.points} points</div>
-                <div>⏱️ ~{chore.estimatedMinutes} minutes</div>
+                <div>⚡ {chore?.points || 5} points</div>
+                <div>⏱️ ~{chore?.estimatedMinutes || 15} minutes</div>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button
-                  onClick={() => handleCompleteChore(chore._id)}
+                  onClick={() => chore?._id && handleCompleteChore(chore._id)}
+                  disabled={!chore?._id}
                   style={{
-                    backgroundColor: '#28a745',
+                    backgroundColor: chore?._id ? '#28a745' : '#6c757d',
                     color: 'white',
                     border: 'none',
                     padding: '8px 12px',
                     borderRadius: '5px',
-                    cursor: 'pointer',
+                    cursor: chore?._id ? 'pointer' : 'not-allowed',
                     fontSize: '12px',
                     fontWeight: 'bold',
                     flex: 1,
@@ -552,14 +553,15 @@ const ChoreList = () => {
                   ✓ Complete
                 </button>
                 <button
-                  onClick={() => navigate(`/chores/${chore._id}`)}
+                  onClick={() => chore?._id && navigate(`/chores/${chore._id}`)}
+                  disabled={!chore?._id}
                   style={{
-                    backgroundColor: '#007bff',
+                    backgroundColor: chore?._id ? '#007bff' : '#6c757d',
                     color: 'white',
                     border: 'none',
                     padding: '8px 12px',
                     borderRadius: '5px',
-                    cursor: 'pointer',
+                    cursor: chore?._id ? 'pointer' : 'not-allowed',
                     fontSize: '12px'
                   }}
                 >
@@ -568,28 +570,30 @@ const ChoreList = () => {
                 {user?.role === 'admin' && (
                   <>
                     <button
-                      onClick={() => startEditing(chore)}
+                      onClick={() => chore && startEditing(chore)}
+                      disabled={!chore}
                       style={{
-                        backgroundColor: '#ffc107',
-                        color: '#212529',
+                        backgroundColor: chore ? '#ffc107' : '#6c757d',
+                        color: chore ? '#212529' : 'white',
                         border: 'none',
                         padding: '8px 12px',
                         borderRadius: '5px',
-                        cursor: 'pointer',
+                        cursor: chore ? 'pointer' : 'not-allowed',
                         fontSize: '12px'
                       }}
                     >
                       ✏️ Edit
                     </button>
                     <button
-                      onClick={() => handleDeleteChore(chore._id)}
+                      onClick={() => chore?._id && handleDeleteChore(chore._id)}
+                      disabled={!chore?._id}
                       style={{
-                        backgroundColor: '#dc3545',
+                        backgroundColor: chore?._id ? '#dc3545' : '#6c757d',
                         color: 'white',
                         border: 'none',
                         padding: '8px 12px',
                         borderRadius: '5px',
-                        cursor: 'pointer',
+                        cursor: chore?._id ? 'pointer' : 'not-allowed',
                         fontSize: '12px'
                       }}
                     >

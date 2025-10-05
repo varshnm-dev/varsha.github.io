@@ -163,30 +163,30 @@ const ChoreDetails = () => {
           </button>
           
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-            <span style={{ fontSize: '48px', marginRight: '20px' }}>{chore.emoji}</span>
+            <span style={{ fontSize: '48px', marginRight: '20px' }}>{chore?.emoji || '🏠'}</span>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h1 style={{ margin: 0, color: '#333' }}>{chore.name}</h1>
+                  <h1 style={{ margin: 0, color: '#333' }}>{chore?.name || 'Unknown Chore'}</h1>
                   <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-                    <span style={{ 
-                      backgroundColor: getDifficultyColor(chore.difficulty),
+                    <span style={{
+                      backgroundColor: getDifficultyColor(chore?.difficulty || 'Easy'),
                       color: 'white',
                       padding: '4px 12px',
                       borderRadius: '15px',
                       fontSize: '14px',
                       fontWeight: 'bold'
                     }}>
-                      {chore.difficulty}
+                      {chore?.difficulty || 'Easy'}
                     </span>
-                    <span style={{ 
+                    <span style={{
                       backgroundColor: '#f8f9fa',
                       color: '#495057',
                       padding: '4px 12px',
                       borderRadius: '15px',
                       fontSize: '14px'
                     }}>
-                      {chore.category}
+                      {chore?.category || 'General'}
                     </span>
                   </div>
                 </div>
@@ -419,18 +419,18 @@ const ChoreDetails = () => {
                 <div>
                   <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Points Reward</h4>
                   <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#007bff' }}>
-                    ⚡ {chore.points} points
+                    ⚡ {chore?.points || 5} points
                   </div>
                 </div>
                 <div>
                   <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Estimated Time</h4>
                   <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
-                    ⏱️ {chore.estimatedMinutes} minutes
+                    ⏱️ {chore?.estimatedMinutes || 15} minutes
                   </div>
                 </div>
               </div>
 
-              {chore.description && (
+              {chore?.description && (
                 <div>
                   <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Description</h4>
                   <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#333' }}>

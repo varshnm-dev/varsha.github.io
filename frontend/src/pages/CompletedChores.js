@@ -96,10 +96,10 @@ const CompletedChores = () => {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                     <span style={{ fontSize: '24px', marginRight: '10px' }}>
-                      {completed.chore.emoji}
+                      {completed.chore?.emoji || '🏠'}
                     </span>
                     <h3 style={{ margin: 0, color: '#333' }}>
-                      {completed.chore.name}
+                      {completed.chore?.name || 'Unknown Chore'}
                     </h3>
                     <span style={{
                       backgroundColor: '#28a745',
