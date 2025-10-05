@@ -10,6 +10,8 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      - key: NODE_VERSION
+        value: 18.18.0
       - key: REACT_APP_APP_NAME
         value: Household Gamification
       - key: GENERATE_SOURCEMAP
