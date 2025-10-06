@@ -281,17 +281,17 @@ exports.deleteCompletedChore = async (req, res) => {
             });
         }
 
-        // Check if completed chore belongs to user
-        if (completedChore.user.toString() !== req.user.id) {
+        // Check if completed chore belongs to user's household
+        if (completedChore.household.toString() !== req.user.household.toString()) {
             return res.status(403).json({
                 success: false,
-                message: 'You can only delete your own completed chores'
+                message: 'You can only delete completed chores in your own household'
             });
         }
 
-        // Remove points from user
+        // Remove points from the user who originally completed the chore
         await User.findByIdAndUpdate(
-            req.user._id,
+            completedChore.user,
             { $inc: { points: -completedChore.pointsEarned } }
         );
 

@@ -16,6 +16,9 @@ const ChoreList = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showMarketplace, setShowMarketplace] = useState(false);
   const [editingChore, setEditingChore] = useState(null);
+  const [householdMembers, setHouseholdMembers] = useState([]);
+  const [completingChoreId, setCompletingChoreId] = useState(null);
+  const [selectedCompletedBy, setSelectedCompletedBy] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -40,6 +43,7 @@ const ChoreList = () => {
 
   useEffect(() => {
     fetchAllChores();
+    fetchHouseholdMembers();
   }, []);
 
   useEffect(() => {
@@ -71,16 +75,39 @@ const ChoreList = () => {
     }
   };
 
-  const handleCompleteChore = async (choreId) => {
+  const fetchHouseholdMembers = async () => {
+    try {
+      const response = await api.getHousehold();
+      setHouseholdMembers(response.data.data.household.members || []);
+    } catch (err) {
+      console.error('Failed to fetch household members:', err);
+    }
+  };
+
+  const handleCompleteChore = async (choreId, completedBy = null) => {
     try {
       await api.completeChore({
         chore: choreId,
-        qualityRating: 5
+        qualityRating: 5,
+        completedBy: completedBy || user._id
       });
       toast.success('Chore completed successfully!');
+      setCompletingChoreId(null);
+      setSelectedCompletedBy('');
       fetchAllChores(); // Refresh the list
     } catch (err) {
       toast.error('Failed to complete chore');
+    }
+  };
+
+  const handleShowCompletionModal = (choreId) => {
+    setCompletingChoreId(choreId);
+    setSelectedCompletedBy(user._id); // Default to current user
+  };
+
+  const handleConfirmCompletion = () => {
+    if (completingChoreId && selectedCompletedBy) {
+      handleCompleteChore(completingChoreId, selectedCompletedBy);
     }
   };
 
@@ -441,6 +468,91 @@ const ChoreList = () => {
           </div>
         )}
 
+        {/* Chore Completion Modal */}
+        {completingChoreId && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '10px',
+              maxWidth: '400px',
+              width: '90%'
+            }}>
+              <h2 style={{ marginBottom: '20px', textAlign: 'center' }}>Complete Chore</h2>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+                  Who completed this chore?
+                </label>
+                <select
+                  value={selectedCompletedBy}
+                  onChange={(e) => setSelectedCompletedBy(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff'
+                  }}
+                >
+                  {householdMembers.map(member => (
+                    <option key={member._id} value={member._id}>
+                      {member.username} {member._id === user._id ? '(You)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => {
+                    setCompletingChoreId(null);
+                    setSelectedCompletedBy('');
+                  }}
+                  style={{
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmCompletion}
+                  style={{
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Complete Chore
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Category Filter - Only show if there are chores */}
         {chores.length > 0 && (
           <div style={{ marginBottom: '30px' }}>
@@ -535,7 +647,7 @@ const ChoreList = () => {
 
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button
-                  onClick={() => chore?._id && handleCompleteChore(chore._id)}
+                  onClick={() => chore?._id && handleShowCompletionModal(chore._id)}
                   disabled={!chore?._id}
                   style={{
                     backgroundColor: chore?._id ? '#28a745' : '#6c757d',

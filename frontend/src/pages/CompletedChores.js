@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { toast } from 'react-toastify';
@@ -10,7 +9,6 @@ const CompletedChores = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { user } = useAuth();
 
   const fetchCompletedChores = useCallback(async () => {
     try {
@@ -143,22 +141,20 @@ const CompletedChores = () => {
                   )}
                 </div>
 
-                {completed.user._id === user._id && (
-                  <button
-                    onClick={() => handleDeleteCompletedChore(completed._id)}
-                    style={{
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      padding: '8px 12px',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                      fontSize: '12px'
-                    }}
-                  >
-                    Delete
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDeleteCompletedChore(completed._id)}
+                  style={{
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 12px',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}
