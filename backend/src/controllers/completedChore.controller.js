@@ -143,10 +143,24 @@ exports.createCompletedChore = async (req, res) => {
         const multiplier = household.pointMultiplier || 1;
         const pointsEarned = basePoints * multiplier;
 
+        // Determine who completed the chore (defaults to current user)
+        const completedByUserId = req.body.completedBy || req.user._id;
+
+        // Verify the completedBy user is in the same household
+        if (req.body.completedBy && req.body.completedBy !== req.user._id) {
+            const completedByUser = await User.findById(req.body.completedBy);
+            if (!completedByUser || completedByUser.household.toString() !== req.user.household.toString()) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Selected user is not in your household'
+                });
+            }
+        }
+
         // Create completed chore
         const completedChore = await CompletedChore.create({
             chore: chore._id,
-            user: req.user._id,
+            user: completedByUserId,
             household: req.user.household,
             pointsEarned,
             qualityRating: req.body.qualityRating || 3,
@@ -156,17 +170,17 @@ exports.createCompletedChore = async (req, res) => {
             completedAt: new Date()
         });
 
-        // Update user points
+        // Update user points (for the user who completed the chore)
         await User.findByIdAndUpdate(
-            req.user._id,
+            completedByUserId,
             { $inc: { points: pointsEarned } }
         );
 
         // Update or create user streak
-        await updateUserStreak(req.user._id);
+        await updateUserStreak(completedByUserId);
 
         // Check for achievements
-        await checkAndGrantAchievements(req.user._id, chore.category);
+        await checkAndGrantAchievements(completedByUserId, chore.category);
 
         await session.commitTransaction();
         session.endSession();

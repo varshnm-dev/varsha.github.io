@@ -13,6 +13,8 @@ const ChoreDetails = () => {
   const [qualityRating, setQualityRating] = useState(5);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
+  const [householdMembers, setHouseholdMembers] = useState([]);
+  const [completedByUser, setCompletedByUser] = useState(null);
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -20,9 +22,18 @@ const ChoreDetails = () => {
   const fetchChore = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.getChore(id);
-      const choreData = response.data.data.chore;
+      const [choreResponse, householdResponse] = await Promise.all([
+        api.getChore(id),
+        api.getHousehold()
+      ]);
+
+      const choreData = choreResponse.data.data.chore;
+      const householdData = householdResponse.data.data.household;
+
       setChore(choreData);
+      setHouseholdMembers(householdData.members || []);
+      setCompletedByUser(user._id); // Default to current user
+
       setEditFormData({
         name: choreData.name,
         category: choreData.category,
@@ -39,7 +50,7 @@ const ChoreDetails = () => {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, user._id]);
 
   useEffect(() => {
     fetchChore();
@@ -50,7 +61,8 @@ const ChoreDetails = () => {
       await api.completeChore({
         chore: id,
         qualityRating,
-        notes: completionNotes
+        notes: completionNotes,
+        completedBy: completedByUser
       });
       toast.success('Chore completed successfully!');
       navigate('/completed');
@@ -452,7 +464,32 @@ const ChoreDetails = () => {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <h3 style={{ marginBottom: '20px', color: '#333' }}>Complete This Chore</h3>
-          
+
+          {/* Who completed the chore */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
+              Who completed this chore?
+            </label>
+            <select
+              value={completedByUser || ''}
+              onChange={(e) => setCompletedByUser(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '5px',
+                fontSize: '14px',
+                backgroundColor: '#fff'
+              }}
+            >
+              {householdMembers.map(member => (
+                <option key={member._id} value={member._id}>
+                  {member.username} {member._id === user._id ? '(You)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Quality Rating */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>

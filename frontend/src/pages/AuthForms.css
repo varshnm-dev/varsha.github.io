@@ -37,6 +37,15 @@
   font-size: 0.9rem;
 }
 
+.auth-success {
+  background-color: #c6f6d5;
+  color: #2f855a;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
 .auth-form {
   margin-bottom: 20px;
 }

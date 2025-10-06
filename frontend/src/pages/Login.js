@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import './AuthForms.css';
 
@@ -10,9 +10,11 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { login, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -20,6 +22,13 @@ const Login = () => {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
+
+  // Handle success message from forgot password redirect
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+    }
+  }, [location.state]);
 
   const { email, password } = formData;
 
@@ -55,6 +64,7 @@ const Login = () => {
         <p className="auth-subtitle">Welcome back! Please enter your credentials to access your account.</p>
 
         {error && <div className="auth-error">{error}</div>}
+        {successMessage && <div className="auth-success">{successMessage}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -96,6 +106,7 @@ const Login = () => {
 
         <div className="auth-footer">
           <p>Don't have an account? <Link to="/register">Register</Link></p>
+          <p><Link to="/forgot-password">Forgot your password?</Link></p>
         </div>
       </div>
     </div>

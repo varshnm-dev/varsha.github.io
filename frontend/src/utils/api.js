@@ -143,6 +143,11 @@ const api = {
 
   getAllTimeLeaderboard: async () => {
     return axios.get('/leaderboard/all-time');
+  },
+
+  // Password Reset
+  resetPassword: async (resetData) => {
+    return axios.post('/auth/reset-password', resetData);
   }
 };
 
